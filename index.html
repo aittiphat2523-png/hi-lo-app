@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ไฮโล — ฟิสิกส์ 3-4-5 ครบถ้วน</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif}
+        body{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:#e2e8f0;min-height:100vh;padding:16px}
+        .container{max-width:500px;margin:0 auto}
+        h1{text-align:center;color:#f59e0b;margin-bottom:20px;font-size:1.25rem;font-weight:700;letter-spacing:0.5px}
+        .box{background:#1e293b;border:1px solid #334155;padding:20px;border-radius:16px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+        button{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s ease}
+        .btn-ready{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 4px 12px rgba(22,163,74,0.25)}
+        .btn-ready:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(22,163,74,0.35)}
+        .btn-active{background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;animation:pulse .8s infinite;box-shadow:0 4px 12px rgba(220,38,38,0.25)}
+        @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.01)}100%{opacity:1;transform:scale(1)}}
+        .btn-save{background:linear-gradient(135deg,#10b981,#059669);color:#fff;margin-top:12px;box-shadow:0 4px 12px rgba(16,185,129,0.25)}
+        .btn-save:disabled{background:#475569;cursor:not-allowed;opacity:.6;transform:none;box-shadow:none}
+        .btn-num{background:linear-gradient(145deg,#374151,#1f2937);color:#fff;width:64px;height:64px;font-size:22px;margin:4px;border-radius:10px;border:1px solid #4b5563;transition:all .15s}
+        .btn-num:hover{background:#4b5563;transform:scale(1.05)}
+        .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+        .res{font-size:15px;font-weight:600;margin:8px 0;padding:14px;border-radius:10px;text-align:center;transition:all .2s}
+        .c-white{background:linear-gradient(135deg,#f8fafc,#e2e8f0);color:#1e293b;border:1px solid #cbd5e1}
+        .c-green{background:linear-gradient(135deg,#bbf7d0,#86efac);color:#166534;border:1px solid #4ade80}
+        .c-yellow{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border:1px solid #fbbf24}
+        .c-red{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#991b1b;border:1px solid #f87171}
+        .timer{font-size:22px;font-weight:700;text-align:center;margin:12px 0;padding:10px;background:#1e293b;border-radius:10px;color:#fbbf24;letter-spacing:1px}
+        .stat-row{display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #334155;font-size:14px;align-items:center;transition:background .15s}
+        .stat-row:hover{background:#273449}
+        input,select{width:100%;padding:14px;margin:6px 0;border-radius:10px;border:1px solid #475569;font-size:16px;background:#1e293b;color:#fff;transition:border .15s}
+        input:focus,select:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+        .note-tag{display:inline-block;padding:4px 12px;border-radius:20px;margin:0 6px;font-size:13px;font-weight:600}
+        .even{background:#22c55e;color:#fff}
+        .odd{background:#a855f7;color:#fff}
+        .hidden{display:none}
+        .clear-btn{background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;padding:12px;border-radius:10px;margin-top:8px;border:none;box-shadow:0 4px 12px rgba(220,38,38,0.2)}
+        .ai-bar{height:10px;background:#1e293b;border-radius:5px;margin-top:6px;overflow:hidden;border:1px solid #334155}
+        .ai-fill{height:100%;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);width:70%;transition:width .6s ease}
+        .sym{font-size:20px;margin-right:8px}
+        .phys{font-size:13px;color:#94a3b8;margin-top:6px;line-height:1.8}
+        .phys-box{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px}
+        .phys-title{font-size:14px;font-weight:600;color:#94a3b8;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .phys-rank-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #2e3b4f}
+        .phys-rank-item:last-child{border-bottom:none}
+        .phys-rank-name{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+        .phys-rank-pct{font-weight:700;font-size:16px;color:#f59e0b}
+        .section-title{font-size:15px;font-weight:600;color:#e5e7eb;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #374151;display:flex;align-items:center;gap:8px}
+        .rank-container{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+        .rank-item{padding:14px 16px;border-radius:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:transform .15s}
+        .rank-item:hover{transform:scale(1.01)}
+        .rank-num{font-size:18px;font-weight:700;opacity:0.7}
+        .rank-label{display:flex;align-items:center;gap:10px}
+        .rank-pct{font-size:18px;font-weight:700}
+        .rank-1{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border:1px solid #fbbf24}
+        .rank-2{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border:1px solid #6ee7b7}
+        .rank-3{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af;border:1px solid #93c5fd}
+        .rank-4{background:linear-gradient(135deg,#f3e8ff,#e9d5ff);color:#6b21a8;border:1px solid #d8b4fe}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>⚙️ ฟิสิกส์ 3-4-5 ครบถ้วน</h1>
+
+    <div class="box">
+        <button id="listenBtn" class="btn-ready" onclick="startListen()">🎙️ พร้อมฟัง — 4.30 วินาที</button>
+        <div id="status" style="margin-top:12px;text-align:center;color:#94a3b8;font-size:14px">กดปุ่ม → อนุญาตไมโครโฟน</div>
+        <div id="diceStatus" style="text-align:center;font-size:14px;margin:8px 0;color:#94a3b8">ตรวจจับเสียง...</div>
+        <div id="timer" class="timer">---</div>
+
+        <div id="resultsArea" class="hidden" style="margin-top:18px;border-top:1px solid #374151;padding-top:18px">
+            <div class="phys-box">
+                <div class="phys-title">📐 ค่าทางฟิสิกส์</div>
+                <div id="physData" class="phys"></div>
+            </div>
+
+            <div class="section-title">🎯 ลำดับความน่าจะเป็น — จากมากไปน้อย</div>
+            <div id="soundNote" class="res" style="margin-bottom:12px"></div>
+            
+            <div id="physRankList">
+                <!-- แสดงผลที่นี่ -->
+            </div>
+
+            <div style="margin-top:16px;padding:12px;background:#1e293b;border-radius:10px;border:1px solid #334155">
+                <div style="font-size:13px;color:#94a3b8;margin-bottom:6px">ความมั่นใจ AI</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                    <span style="font-weight:700;font-size:20px" id="confVal">70.0%</span>
+                    <span style="font-size:12px;color:#6b7280">ค่ามั่นใจ</span>
+                </div>
+                <div class="ai-bar"><div id="confBar" class="ai-fill" style="width:70%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">📝 บันทึกข้อมูลจริง — 3 หลัก</div>
+        <input type="text" id="diceInput" maxlength="3" placeholder="กดปุ่มด้านล่าง" readonly style="text-align:center;font-size:24px;font-weight:700;letter-spacing:8px;padding:16px">
+        <div class="numpad">
+            <button class="btn-num" onclick="appendNum('1')">1</button>
+            <button class="btn-num" onclick="appendNum('2')">2</button>
+            <button class="btn-num" onclick="appendNum('3')">3</button>
+            <button class="btn-num" onclick="appendNum('4')">4</button>
+            <button class="btn-num" onclick="appendNum('5')">5</button>
+            <button class="btn-num" onclick="appendNum('6')">6</button>
+        </div>
+        <button class="clear-btn" onclick="clearInput()">🗑️ ล้างตัวเลข</button>
+        
+        <div style="margin:16px 0 8px 0;font-weight:600;color:#e5e7eb">🎵 คีย์ที่ได้ยินจริง:</div>
+        <select id="actualNote">
+            <option value="">-- กรุณาเลือกคีย์เสียง --</option>
+            <option value="โด">โด / เขียว / คู่</option>
+            <option value="เร">เร / แดง / คู่</option>
+            <option value="ซี">ซี / เหลือง / คี่</option>
+            <option value="ลา">ลา / ขาว / คี่</option>
+        </select>
+        
+        <button class="btn-save" id="saveBtn" onclick="saveRecord()">💾 บันทึกข้อมูลจริง</button>
+        <div id="calcResult" style="margin-top:14px;text-align:center;font-weight:600;min-height:40px;line-height:1.5"></div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">📊 ประวัติ 5 รายการล่าสุด</div>
+        <div id="recentList"></div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">📉 ลำดับความน่าจะเป็น — มาก → น้อย</div>
+        <div class="rank-container">
+            <div id="rank1" class="rank-item rank-1">
+                <span class="rank-label"><span class="rank-num">1</span> <span id="r1Sym"></span> <span id="r1Name"></span></span>
+                <span class="rank-pct" id="r1Pct">--</span>
+            </div>
+            <div id="rank2" class="rank-item rank-2">
+                <span class="rank-label"><span class="rank-num">2</span> <span id="r2Sym"></span> <span id="r2Name"></span></span>
+                <span class="rank-pct" id="r2Pct">--</span>
+            </div>
+            <div id="rank3" class="rank-item rank-3">
+                <span class="rank-label"><span class="rank-num">3</span> <span id="r3Sym"></span> <span id="r3Name"></span></span>
+                <span class="rank-pct" id="r3Pct">--</span>
+            </div>
+            <div id="rank4" class="rank-item rank-4">
+                <span class="rank-label"><span class="rank-num">4</span> <span id="r4Sym"></span> <span id="r4Name"></span></span>
+                <span class="rank-pct" id="r4Pct">--</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="section-title">📈 สถิติสะสมทั้งหมด</div>
+        <div class="stat-row"><span style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">⬜</span> ขาว (ลา/คี่)</span><span id="statWhite" style="font-weight:700;font-size:16px">0</span></div>
+        <div class="stat-row"><span style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🟩</span> เขียว (โด/คู่)</span><span id="statGreen" style="font-weight:700;font-size:16px">0</span></div>
+        <div class="stat-row"><span style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🟨</span> เหลือง (ซี/คี่)</span><span id="statYellow" style="font-weight:700;font-size:16px">0</span></div>
+        <div class="stat-row"><span style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🟥</span> แดง (เร/คู่)</span><span id="statRed" style="font-weight:700;font-size:16px">0</span></div>
+        <div class="stat-row" style="font-weight:700;border-top:1px solid #4b5563;margin-top:8px;padding-top:12px">
+            <span>📊 รวมทั้งหมด</span><span id="statTotal" style="font-size:18px;color:#f59e0b">0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+'use strict';
+let isListening = false;
+let audioContext = null;
+let records = [];
+let stats = { white:0, green:0, yellow:0, red:0 };
+
+const noteMap = {
+    'เขียว': { note:'โด', type:'คู่', sym:'🟩' },
+    'แดง': { note:'เร', type:'คู่', sym:'🟥' },
+    'เหลือง': { note:'ซี', type:'คี่', sym:'🟨' },
+    'ขาว': { note:'ลา', type:'คี่', sym:'⬜' }
+};
+const noteToColor = { 'โด':'เขียว', 'เร':'แดง', 'ซี':'เหลือง', 'ลา':'ขาว' };
+const LISTEN_DURATION = 4300;
+const BASE_CONFIDENCE = 70;
+
+function physicsFromEnergy(energy){
+    const Ek = energy * energy / 1000;
+    const p = Math.sqrt(Ek);
+    const d = 0.005;
+    const F = Ek / d;
+    return { Ek:Ek.toFixed(1), p:p.toFixed(1), F:F.toFixed(0), raw:energy };
+}
+
+function appendNum(n){
+    const inp = document.getElementById('diceInput');
+    if(inp.value.length < 3) inp.value += n;
+}
+function clearInput(){
+    document.getElementById('diceInput').value = '';
+}
+
+function loadData(){
+    const saved = localStorage.getItem('diceRecords_v2');
+    if(saved){
+        const d = JSON.parse(saved);
+        records = d.records || [];
+        stats = d.stats || { white:0, green:0, yellow:0, red:0 };
+    }
+    updateAllDisplays();
+}
+function saveData(){
+    localStorage.setItem('diceRecords_v2', JSON.stringify({records, stats}));
+    updateAllDisplays();
+}
+
+function getColor(sum){
+    const mod = sum % 4;
+    if(mod === 1) return 'ขาว';
+    if(mod === 2) return 'เขียว';
+    if(mod === 3) return 'เหลือง';
+    return 'แดง';
+}
+
+async function startListen(){
+    if(isListening) return;
+    isListening = true;
+    const btn = document.getElementById('listenBtn');
+    btn.className = 'btn-active'; btn.innerText = '🔴 กำลังฟังเสียง...';
+
+    try{
+        if(!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        const src = audioContext.createMediaStreamSource(stream);
+        const analyzer = audioContext.createAnalyser();
+        analyzer.fftSize = 256;
+        src.connect(analyzer);
+
+        document.getElementById('status').innerText = 'กำลังวัดค่าพลังงานเสียง...';
+        document.getElementById('diceStatus').innerText = 'รอสัญญาณเสียงตกกระทบ...';
+
+        let energySum = 0, peakEnergy = 0, frameCount = 0;
+        const startTime = Date.now();
+
+        const check = () => {
+            const elapsed = Date.now() - startTime;
+            if(elapsed >= LISTEN_DURATION){
+                finishListen(energySum, peakEnergy, frameCount);
+                stream.getTracks().forEach(t => t.stop());
+                return;
+            }
+            const arr = new Uint8Array(analyzer.frequencyBinCount);
+            analyzer.getByteFrequencyData(arr);
+            const energy = arr.reduce((a,b) => a + b, 0) / arr.length;
+            if(energy > 20){
+                energySum += energy;
+                if(energy > peakEnergy) peakEnergy = energy;
+                frameCount++;
+            }
+            document.getElementById('timer').innerText = ((LISTEN_DURATION - elapsed)/1000).toFixed(2) + ' วินาที';
+            requestAnimationFrame(check);
+        };
+        check();
+    }catch(err){
+        alert('ไม่สามารถเข้าถึงไมโครโฟนได้\n- ต้องใช้ผ่าน HTTPS หรือ localhost\n- ต้องอนุญาตสิทธิ์ในเบราว์เซอร์');
+        resetBtn();
+    }
+}
+
+function finishListen(totalEnergy, peakEnergy, count){
+    isListening = false;
+    resetBtn();
+    if(count === 0){
+        document.getElementById('resultsArea').classList.add('hidden');
+        document.getElementById('diceStatus').innerText = '⚠️ ไม่พบสัญญาณเสียงที่ชัดเจน';
+        return;
+    }
+
+    const avgEnergy = totalEnergy / count;
+    const phys = physicsFromEnergy(peakEnergy);
+
+    document.getElementById('physData').innerHTML =
+        '• พลังงานจลน์ Eₖ = ' + phys.Ek + ' J<br>' +
+        '• โมเมนตัม p = ' + phys.p + ' kg·m/s<br>' +
+        '• แรงกระทบ F = ' + phys.F + ' N<br>' +
+        '• ค่าพลังงานสูงสุด = ' + phys.raw.toFixed(0) + ' units';
+
+    let soundNoteName;
+    if(peakEnergy > 180) soundNoteName = 'เร';
+    else if(peakEnergy > 120) soundNoteName = 'โด';
+    else if(peakEnergy > 60) soundNoteName = 'ซี';
+    else soundNoteName = 'ลา';
+
+    const soundColor = noteToColor[soundNoteName];
+    const soundType = (soundNoteName === 'โด' || soundNoteName === 'เร') ? 'คู่' : 'คี่';
+
+    document.getElementById('soundNote').className = `res c-${
+        soundColor==='ขาว'?'white':soundColor==='เขียว'?'green':soundColor==='เหลือง'?'yellow':'red'}`;
+    document.getElementById('soundNote').innerHTML = `<span style="font-size:22px">${noteMap[soundColor].sym}</span> ได้ยิน: ${soundNoteName} / ${soundColor} / ${soundType}`;
+
+    const scores = calculateMixedScores(phys);
+    
+    const physArr = [
+        {name:'ขาว', score:scores['ขาว'], sym:'⬜'},
+        {name:'เขียว', score:scores['เขียว'], sym:'🟩'},
+        {name:'เหลือง', score:scores['เหลือง'], sym:'🟨'},
+        {name:'แดง', score:scores['แดง'], sym:'🟥'}
+    ];
+    
+    physArr.sort((a,b) => b.score - a.score);
+    
+    let html = '';
+    physArr.forEach((item, index) => {
+        html += `
+        <div class="phys-rank-item">
+            <span class="phys-rank-name">${index + 1}. ${item.sym} ${item.name}</span>
+            <span class="phys-rank-pct">${item.score.toFixed(1)}%</span>
+        </div>`;
+    });
+    document.getElementById('physRankList').innerHTML = html;
+
+    const conf = calculateConfidence(avgEnergy, count, phys);
+    document.getElementById('confVal').innerText = conf.toFixed(1) + '%';
+    document.getElementById('confBar').style.width = conf + '%';
+
+    document.getElementById('resultsArea').classList.remove('hidden');
+    document.getElementById('diceStatus').innerText = '✅ วิเคราะห์เสร็จสิ้น';
+}
+
+function calculateConfidence(energy, count, phys){
+    const total = stats.white + stats.green + stats.yellow + stats.red;
+    let learnBonus = 0;
+    if(total > 0){
+        const ideal = total / 4;
+        const balance = 1 - (Math.abs(stats.white-ideal) + Math.abs(stats.green-ideal) + Math.abs(stats.yellow-ideal) + Math.abs(stats.red-ideal)) / (2*total);
+        learnBonus = balance * 15;
+    }
+    const energyScore = Math.min(15, (phys.raw / 200) * 15);
+    const countScore = Math.min(5, count * 0.5);
+    return Math.min(99, BASE_CONFIDENCE + learnBonus + energyScore + countScore);
+}
+
+function calculateMixedScores(phys){
+    const total = stats.white + stats.green + stats.yellow + stats.red;
+    if(total === 0) return {'ขาว':25,'เขียว':25,'เหลือง':25,'แดง':25};
+
+    const base = {
+        'ขาว': (stats.white/total)*100,
+        'เขียว': (stats.green/total)*100,
+        'เหลือง': (stats.yellow/total)*100,
+        'แดง': (stats.red/total)*100
+    };
+
+    const w = {'ขาว':0,'เขียว':0,'เหลือง':0,'แดง':0};
+    records.forEach((r,i) => w[r.color] += (i+1));
+    const wTotal = w['ขาว']+w['เขียว']+w['เหลือง']+w['แดง'] || 1;
+    const weighted = {
+        'ขาว': (w['ขาว']/wTotal)*100,
+        'เขียว': (w['เขียว']/wTotal)*100,
+        'เหลือง': (w['เหลือง']/wTotal)*100,
+        'แดง': (w['แดง']/wTotal)*100
+    };
+
+    const balance = {
+        'ขาว': 25 - Math.abs(base['ขาว'] - 25),
+        'เขียว': 25 - Math.abs(base['เขียว'] - 25),
+        'เหลือง': 25 - Math.abs(base['เหลือง'] - 25),
+        'แดง': 25 - Math.abs(base['แดง'] - 25)
+    };
+
+    return {
+        'ขาว': base['ขาว']*0.3 + weighted['ขาว']*0.4 + balance['ขาว']*0.3,
+        'เขียว': base['เขียว']*0.3 + weighted['เขียว']*0.4 + balance['เขียว']*0.3,
+        'เหลือง': base['เหลือง']*0.3 + weighted['เหลือง']*0.4 + balance['เหลือง']*0.3,
+        'แดง': base['แดง']*0.3 + weighted['แดง']*0.4 + balance['แดง']*0.3
+    };
+}
+
+function resetBtn(){
+    document.getElementById('listenBtn').className = 'btn-ready';
+    document.getElementById('listenBtn').innerText = '🎙️ พร้อมฟัง — 4.30 วินาที';
+    document.getElementById('timer').innerText = '---';
+    document.getElementById('status').innerText = 'กดปุ่ม → อนุญาตไมโครโฟน';
+}
+
+function saveRecord(){
+    const val = document.getElementById('diceInput').value.trim();
+    const selNote = document.getElementById('actualNote').value;
+    
+    if(val.length !== 3 || !/^[1-6]{3}$/.test(val)){
+        document.getElementById('calcResult').innerHTML = '<span style="color:#f87171">⚠️ กรอกเลข 3 หลัก (1-6) เท่านั้น</span>';
+        setTimeout(()=>document.getElementById('calcResult').innerHTML='',3000);
+        return;
+    }
+    if(!selNote){
+        document.getElementById('calcResult').innerHTML = '<span style="color:#f87171">⚠️ กรุณาเลือกคีย์ที่ได้ยินจริง</span>';
+        setTimeout(()=>document.getElementById('calcResult').innerHTML='',3000);
+        return;
+    }
+
+    const nums = val.split('').map(Number);
+    const sum = nums[0]+nums[1]+nums[2];
+    const color = getColor(sum);
+    records.push({val, sum, color, note:selNote, time:Date.now()});
+    
+    stats[color === 'ขาว' ? 'white' : color === 'เขียว' ? 'green' : color === 'เหลือง' ? 'yellow' : 'red']++;
+    
+    saveData();
+    document.getElementById('calcResult').className = `res c-${
+        color==='ขาว'?'white':color==='เขียว'?'green':color==='เหลือง'?'yellow':'red'}`;
+    document.getElementById('calcResult').innerHTML = `${noteMap[color].sym} ${val} = ผลรวม ${sum} → ${color} | ได้ยิน: ${selNote}`;
+    
+    document.getElementById('diceInput').value = '';
+    document.getElementById('actualNote').value = '';
+}
+
+function updateAllDisplays(){
+    document.getElementById('statWhite').innerText = stats.white;
+    document.getElementById('statGreen').innerText = stats.green;
+    document.getElementById('statYellow').innerText = stats.yellow;
+    document.getElementById('statRed').innerText = stats.red;
+    const total = stats.white + stats.green + stats.yellow + stats.red;
+    document.getElementById('statTotal').innerText = total;
+
+    const recent = records.slice(-5).reverse();
+    let html = '';
+    recent.forEach((r, i) => {
+        html += `<div class="stat-row"><span style="display:flex;align-items:center;gap:8px">${noteMap[r.color].sym} ${i+1}. ${r.val} (${r.note})</span><span>${r.color}</span></div>`;
+    });
+    document.getElementById('recentList').innerHTML = html || '<div style="text-align:center;color:#94a3b8;padding:20px">ยังไม่มีข้อมูล</div>';
+
+    if(total === 0){
+        for(let i=1;i<=4;i++){
+            document.getElementById(`r${i}Sym`).innerText = '';
+            document.getElementById(`r${i}Name`).innerText = 'ยังไม่มีข้อมูล';
+            document.getElementById(`r${i}Pct`).innerText = '--';
+        }
+        return;
+    }
+    const scores = calculateMixedScores({raw:0});
+    const arr = [
+        {name:'ขาว', score:scores['ขาว'], sym:'⬜'},
+        {name:'เขียว', score:scores['เขียว'], sym:'🟩'},
+        {name:'เหลือง', score:scores['เหลือง'], sym:'🟨'},
+        {name:'แดง', score:scores['แดง'], sym:'🟥'}
+    ];
+    arr.sort((a,b) => b.score - a.score);
+    
+    document.getElementById('r1Sym').innerText = arr[0].sym;
+    document.getElementById('r1Name').innerText = arr[0].name;
+    document.getElementById('r1Pct').innerText = arr[0].score.toFixed(1) + '%';
+    
+    document.getElementById('r2Sym').innerText = arr[1].sym;
+    document.getElementById('r2Name').innerText = arr[1].name;
+    document.getElementById('r2Pct').innerText = arr[1].score.toFixed(1) + '%';
+    
+    document.getElementById('r3Sym').innerText = arr[2].sym;
+    document.getElementById('r3Name').innerText = arr[2].name;
+    document.getElementById('r3Pct').innerText = arr[2].score.toFixed(1) + '%';
+    
+    document.getElementById('r4Sym').innerText = arr[3].sym;
+    document.getElementById('r4Name').innerText = arr[3].name;
+    document.getElementById('r4Pct').innerText = arr[3].score.toFixed(1) + '%';
+}
+
+loadData();
+</script>
+</body>
+</html>
